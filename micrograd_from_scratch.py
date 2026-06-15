@@ -59,7 +59,7 @@ print('d2', d2)
 print('slope', (d2 - d1)/h)
 
 
-# In[46]:
+# In[40]:
 
 
 class Value:
@@ -89,19 +89,19 @@ d = a*b + c
 d
 
 
-# In[47]:
+# In[37]:
 
 
 d._prev
 
 
-# In[48]:
+# In[38]:
 
 
 d._op
 
 
-# In[4]:
+# In[25]:
 
 
 from graphviz import Digraph
@@ -118,13 +118,13 @@ dot.edge = ('C', 'A')
 dot.render('my_first_graph', format='png', view=True)
 
 
-# In[3]:
+# In[26]:
 
 
 pip install graphviz
 
 
-# In[8]:
+# In[27]:
 
 
 from graphviz import Digraph
@@ -143,16 +143,54 @@ dot.render('my_first_graph', format='png', view=True)
 dot
 
 
-# In[ ]:
+# In[41]:
 
 
 from graphviz import Digraph
 
 def trace(root):
       # builds a set of all nodes and edges in a graph
-    if v not in nodes: 
-        nodes.add(v)
-        for child in v._prev:
-            edges.add((child, v))
-            build(child,
+    nodes = set()  # Initialize nodes set
+    edges = set()  # Initialize edges set
+    
+    def build(v):
+        if v not in nodes: 
+            nodes.add(v)
+            for child in v._prev:
+                edges.add((child, v))
+                build(child)
+    build(root)
+    return nodes, edges
+
+    
+def draw_dot(root):
+    dot = Digraph(format='svg', graph_attr={'rankdir': 'LR'}) # LR = left to right
+
+    nodes, edges = trace(root)
+    for n in nodes:
+        uid = str(id(n))
+    # for any value in the graph, create a rectangular ('record') node for it
+        dot.node(name = uid, label = "{ %s data %.4f }" % (n.data, ), shape='record')
+        if n._op:
+            dot.node(name = uid + n._op, label = n._op)
+            dot.edge(uid + n._op, uid)
+
+    for n1,n2 in edges:
+    # connect n1 to the op node of n2
+    
+        dot.edge(str(id(n1)), str(id(n1)) + n2._op)
+
+    return dot
+
+
+# In[42]:
+
+
+draw_dot(d)
+
+
+# In[ ]:
+
+
+
 
